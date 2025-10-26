@@ -44,16 +44,23 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.gmail.melvinmalongamatouba.todido.MainActivity
 import com.gmail.melvinmalongamatouba.todido.R
-import com.gmail.melvinmalongamatouba.todido.viewmodel.TacheViewModel
 import com.gmail.melvinmalongamatouba.todido.model.Statut
+import com.gmail.melvinmalongamatouba.todido.viewmodel.TacheViewModel
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+
 private fun LocalDateTime.show(): String {
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY : HH:mm")
     return this.format(formatter)
 }
 
+private fun String.toDate() : LocalDateTime{
+
+    return LocalDateTime.parse(this, formatter)
+
+}
+
+val formatter: DateTimeFormatter? = DateTimeFormatter.ofPattern("dd/MM/YYYY : HH:mm")
 val FIELD_SET_CARD_COLOR = Color.LightGray
 val FONT_SIZE_FIELD = 16.sp
 val PADDING_CLEF = 16.dp
@@ -73,7 +80,7 @@ fun Tache(tacheVM: TacheViewModel){
     val stringMap = tacheVM.getStringFields()
     val dateDeCreation = tacheVM.getDateDeCreationStr()
     val dateDeRendu = tacheVM.getDateDeRendu()
-    val dateDeMiseAJour = tacheVM.getDateDeMiseAJourStr()
+    val dateDeMiseAJour = tacheVM.getDateDeMiseAJour()
     fun enregistrer(){
         tacheVM.enregistrer()
     }
@@ -83,7 +90,7 @@ fun Tache(tacheVM: TacheViewModel){
             .padding(paddingValues)
             .fillMaxSize()) {
             Text(
-                text = "Derniere mise à jour : $dateDeMiseAJour",
+                text = "Derniere mise à jour : ${dateDeMiseAJour.value.show()}",
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
 
@@ -102,7 +109,9 @@ fun Tache(tacheVM: TacheViewModel){
             ARendrePour(dateDeRendu, tacheVM.modifier)
 
 
-            FieldSet(clefs = stringMap.keys.toList(), valeurs = stringMap.values.toList(), modifier= tacheVM.modifier.weight(1f))
+            FieldSet(clefs = stringMap.keys.toList(), valeurs = stringMap.values.toList(), modifier= tacheVM.modifier.weight(
+                1f
+            ))
             Text(
                 text = "Tache créée le : $dateDeCreation",
                 textAlign = TextAlign.Center,
@@ -124,7 +133,7 @@ fun BoutonRetour(modifier: Modifier, navController: NavController) {
                 navController.navigate("liste")
             }
         )
-        
+
     )
 
 }
@@ -154,9 +163,10 @@ fun BoutonEnregistrer(modifier: Modifier = Modifier, enregistrer : ()-> Unit) {
 fun ARendrePour(date: MutableState<LocalDateTime>, modifier: Modifier){
     Row (verticalAlignment = Alignment.CenterVertically) {
         Field(
-            "pour le :",
+            clef ="pour le :",
             valeur = remember { mutableStateOf(date.value.show()) },
-            modifier = modifier.weight(5f)
+            modifier = modifier.weight(5f),
+
         )
         ChoixDateRendu(modifier.weight(1f))
     }
@@ -170,9 +180,11 @@ fun ChoixDateRendu(modifier : Modifier = Modifier){
     Icon(
         painter = painterResource(R.drawable.outline_calendar_month_24),
         contentDescription = "Choississez la date de rendu",
-        modifier = modifier.clickable(
-            onClick = { showDatePicker = true}
-        ).fillMaxWidth()
+        modifier = modifier
+            .clickable(
+                onClick = { showDatePicker = true }
+            )
+            .fillMaxWidth()
     )
 
     if (showDatePicker){
@@ -197,11 +209,13 @@ fun Statut(statut : MutableState<Statut>, modifier: Modifier = Modifier){
     Box {
 
         Card(
-            modifier = modifier.padding(10.dp).clickable(
-                onClick = {
-                    displayChangeStatus.value = true
-                }
-            ),
+            modifier = modifier
+                .padding(10.dp)
+                .clickable(
+                    onClick = {
+                        displayChangeStatus.value = true
+                    }
+                ),
             shape = CircleShape,
             colors = CardDefaults.cardColors(
                 containerColor = color
@@ -211,7 +225,9 @@ fun Statut(statut : MutableState<Statut>, modifier: Modifier = Modifier){
             Text(
                 text = statut.value.toString(),  //PlaceHolder
                 color = Color.DarkGray,
-                modifier = modifier.padding(10.dp).wrapContentSize(Alignment.Center)
+                modifier = modifier
+                    .padding(10.dp)
+                    .wrapContentSize(Alignment.Center)
             )
         }
         if (displayChangeStatus.value){
@@ -238,7 +254,9 @@ fun StatutBubbleOnlyAesthetic(statut: Statut, modifier : Modifier = Modifier ){
         Text(
             text = statut.toString(),  //PlaceHolder
             color = Color.DarkGray,
-            modifier = modifier.padding(10.dp).wrapContentSize(Alignment.Center)
+            modifier = modifier
+                .padding(10.dp)
+                .wrapContentSize(Alignment.Center)
         )
     }
 
@@ -283,19 +301,21 @@ fun FieldSet(clefs : List<String>, valeurs : List<MutableState<String>>, modifie
 
 }
 @Composable
-fun Field(clef : String , valeur : MutableState<String>, modifier: Modifier = Modifier){
+fun Field(clef : String , valeur : MutableState<String>, modifier: Modifier = Modifier, onValueChange : (String) -> Unit = { valeur.value = it }){
 
     Card(modifier = modifier) {
         Row (verticalAlignment = Alignment.CenterVertically ){
             Text(
                 text = clef,
                 fontSize = FONT_SIZE_FIELD,
-                modifier = Modifier.weight(1f).padding(PADDING_CLEF)
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(PADDING_CLEF)
             )
 
             OutlinedTextField(
                 value = valeur.value,
-                onValueChange = { valeur.value = it },
+                onValueChange = onValueChange,
                 textStyle = LocalTextStyle.current.merge(TextStyle(fontSize = FONT_SIZE_FIELD)),
                 modifier = Modifier.weight(2f),
                 shape = RoundedCornerShape(0.dp)

@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.gmail.melvinmalongamatouba.todido.model.Statut
 import com.gmail.melvinmalongamatouba.todido.model.Tache
-import com.gmail.melvinmalongamatouba.todido.model.Taches
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -16,6 +15,7 @@ data class TacheViewModel(private var tache: Tache, public val modifier: Modifie
     private val description = mutableStateOf(tache.getDescription())
     private val statut = mutableStateOf(tache.getStatut())
     private val dateDeRendu = mutableStateOf(tache.getDateDeRendu())
+    private var dateDeMiseAJour = mutableStateOf(tache.getDateDeMiseAJour())
 
 
     //Get "modifiable"
@@ -41,22 +41,22 @@ data class TacheViewModel(private var tache: Tache, public val modifier: Modifie
         val formatter = DateTimeFormatter.ofPattern("dd/MM/YYYY : HH:mm")
         return this.format(formatter)
     }
-    fun getDateDeMiseAJourStr() : String {
-        return tache.getDateDeMiseAJour().show()
-    }
     fun getDateDeCreationStr() : String {
         return tache.getDateDeCreation().show()
+    }
+
+    //get en lecture "dynamique"
+
+    fun getDateDeMiseAJour() : MutableState<LocalDateTime> {
+        dateDeMiseAJour = mutableStateOf(tache.getDateDeMiseAJour())
+        return dateDeMiseAJour
     }
 
 
 
     fun enregistrer(){
         tache.setLibelle(libelle.value).setDescription(description.value).setType(type.value).setStatut(statut.value).setDateDeRendu(dateDeRendu.value)
-        this.tache = Taches.get(tache.getId())
+        dateDeMiseAJour = mutableStateOf(tache.getDateDeMiseAJour())
     }
 
-    fun enregistrer (libelle : String, description: String, type : String, statut : Statut, dateDeRendu : LocalDateTime){
-        tache.setLibelle(libelle).setDescription(description).setType(type).setStatut(statut).setDateDeRendu(dateDeRendu)
-        this.tache = Taches.get(tache.getId())
-    }
 }
