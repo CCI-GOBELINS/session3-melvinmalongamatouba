@@ -2,12 +2,15 @@ package com.gmail.melvinmalongamatouba.todido.view
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,13 +48,19 @@ fun Liste(tachesVM : TachesViewModel){
 
 
         Column {
-            Row {
-
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Icon(
                     painter = painterResource(R.drawable.add),
-                    contentDescription = "Button to create a new task",
-                    modifier = tachesVM.modifier.clickable(
-                        onClick = {
+                    contentDescription = "Créer une nouvelle tâche",
+                    modifier = Modifier
+                        .size(48.dp) // Taille de l’icône
+                        .clickable {
                             val tache = Tache(
                                 libelle = "",
                                 type = "",
@@ -59,21 +68,22 @@ fun Liste(tachesVM : TachesViewModel){
                                 dateDeRendu = LocalDateTime.now()
                             )
                             tachesVM.navController.navigate("Tache/${tache.getId()}")
-                        }
-                    )
+                        },
+                    tint = MaterialTheme.colorScheme.primary
                 )
+
                 Icon(
                     painter = painterResource(R.drawable.sort),
-                    contentDescription = "Button to change the sorting criteria",
-                    modifier = tachesVM.modifier.clickable(
-                        onClick = {
+                    contentDescription = "Changer le critère de tri",
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clickable {
                             showSortingChoice.value = true
-                        }
-                    )
+                        },
+                    tint = MaterialTheme.colorScheme.primary
                 )
-
-
             }
+
 
             LazyColumn(modifier = tachesVM.modifier.fillMaxWidth()) {
                 items(tachesVM.count()) { index ->
@@ -125,19 +135,21 @@ fun ListItem(tache: Tache, navController: NavController, modifier: Modifier = Mo
 
 @Composable
 fun SortingChoices(tachesVM: TachesViewModel, showSortingChoice : MutableState<Boolean>){
-    LazyColumn { 
-        items(ModeDeTri.entries.size){
-            index -> Text(
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(0.dp) // ou 4.dp, etc.
+    ) {
+        items(ModeDeTri.entries.size) { index ->
+            Text(
                 text = ModeDeTri.entries[index].toString(),
-                modifier = tachesVM.modifier.clickable(
-                    onClick = {
+                modifier = tachesVM.modifier
+                    .clickable {
                         tachesVM.setModeDetri(ModeDeTri.entries[index])
-                        showSortingChoice.value=false
+                        showSortingChoice.value = false
                     }
-                )
             )
         }
     }
+
 }
 
 @Composable

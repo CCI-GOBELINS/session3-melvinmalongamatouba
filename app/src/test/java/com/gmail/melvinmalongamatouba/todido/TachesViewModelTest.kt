@@ -1,5 +1,7 @@
 package com.gmail.melvinmalongamatouba.todido
 
+import androidx.compose.runtime.Composable
+import androidx.navigation.compose.rememberNavController
 import com.gmail.melvinmalongamatouba.todido.model.Tache
 import com.gmail.melvinmalongamatouba.todido.viewmodel.TachesViewModel
 import org.junit.Assert.*
@@ -8,6 +10,7 @@ import java.time.LocalDateTime
 
 class TachesViewModelTest {
 
+    @Composable
     @Test
     fun testCount (){
         val tachesVM = TachesViewModel(
@@ -37,7 +40,8 @@ class TachesViewModelTest {
                     dateDeRendu = LocalDateTime.now()
                 )
 
-            )
+            ),
+            navController = rememberNavController()
 
 
         )
@@ -46,6 +50,7 @@ class TachesViewModelTest {
         println(tachesVM.count())
     }
 
+    @Composable
     @Test
     fun testContent () {
         val tachesVM = TachesViewModel(
@@ -80,7 +85,8 @@ class TachesViewModelTest {
                     description = "desc",
                     dateDeRendu = LocalDateTime.now()
                 )
-            )
+            ),
+            navController = rememberNavController()
         )
 
         assertEquals("0", tachesVM.item(0).getLibelle())
@@ -90,11 +96,13 @@ class TachesViewModelTest {
         assertEquals("4", tachesVM.item(4).getLibelle())
     }
 
+    @Composable
     @Test
     fun testContentStatic(){
         val tachesVM = TachesViewModel(
             taches = MainActivity.taches,
-            modeDeTri = null
+            modeDeTri = null,
+            navController = rememberNavController()
         )
 
         assertEquals(MainActivity.taches.size ,tachesVM.count())
