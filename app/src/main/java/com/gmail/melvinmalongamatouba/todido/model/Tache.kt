@@ -1,14 +1,29 @@
-package com.gmail.melvinmalongamatouba.todido
+package com.gmail.melvinmalongamatouba.todido.model
 
-import java.time.LocalDate
+import com.gmail.melvinmalongamatouba.todido.MainActivity
+import com.gmail.melvinmalongamatouba.todido.model.Taches.generateId
+import java.time.LocalDateTime
 
 
-object TacheIdGenerator {
+object Taches {
     private var currentId = 0
+    private val liste = mutableMapOf<Int, Tache>()
 
     fun generateId(): Int {
         currentId += 1
         return currentId
+    }
+
+    fun ajouterTache(tache: Tache){
+        liste[tache.getId()] = tache
+    }
+
+    fun liste() : Map<Int, Tache>{
+        return liste
+    }
+
+    fun get(id: Int): Tache {
+        return liste[id]?: MainActivity.tache
     }
 }
 enum class Statut {
@@ -17,18 +32,20 @@ enum class Statut {
     TERMINEE
 }
 
-data class Tache(private var libelle: String, private var type : String, private var description : String, private var dateDeRendu: LocalDate ) {
+data class Tache(private var libelle: String, private var type : String, private var description : String, private var dateDeRendu: LocalDateTime) {
     private var statut : Statut = Statut.A_FAIRE
 
-    private val id : Int = TacheIdGenerator.generateId()
-    private var dateDeMiseAJour : LocalDate = LocalDate.now()
-    private val dateDeCreation : LocalDate = LocalDate.now()
+    private var id : Int =-1
+    private var dateDeMiseAJour : LocalDateTime = LocalDateTime.now()
+    private val dateDeCreation : LocalDateTime = LocalDateTime.now()
 
 
 
     init{
         this.statut = Statut.A_FAIRE
-        this.dateDeMiseAJour = LocalDate.now()
+        this.dateDeMiseAJour = LocalDateTime.now()
+        this.id = Taches.generateId()
+        Taches.ajouterTache(this)
     }
 
     //GETTERS
@@ -42,15 +59,15 @@ data class Tache(private var libelle: String, private var type : String, private
         return this.description
     }
 
-    fun getDateDeRendu() : LocalDate {
+    fun getDateDeRendu() : LocalDateTime {
         return this.dateDeRendu
     }
 
-    fun getDateDeCreation() : LocalDate {
+    fun getDateDeCreation() : LocalDateTime {
         return this.dateDeCreation
     }
 
-    fun getDateDeMiseAJour() : LocalDate {
+    fun getDateDeMiseAJour() : LocalDateTime {
         return this.dateDeMiseAJour
     }
 
@@ -60,6 +77,10 @@ data class Tache(private var libelle: String, private var type : String, private
 
     fun getLibelle() : String {
         return this.libelle
+    }
+
+    fun getId() : Int {
+        return id;
     }
 
 
@@ -78,41 +99,40 @@ data class Tache(private var libelle: String, private var type : String, private
 
     //SETTERS
 
-    private fun quandMisAJour() {
-        this.dateDeMiseAJour = LocalDate.now()
+    private fun quandMisAJour()  {
+        this.dateDeMiseAJour = LocalDateTime.now()
+
     }
 
-    fun setStatut(statut: Statut) {
+    fun setStatut(statut: Statut) : Tache {
         this.statut = statut
         quandMisAJour()
+        return this
     }
 
-    fun setDateDeRendu(dateDeRendu: LocalDate) {
+    fun setDateDeRendu(dateDeRendu: LocalDateTime) : Tache {
         this.dateDeRendu = dateDeRendu
         quandMisAJour()
+        return this
     }
 
-    fun setLibelle(libelle: String) {
+    fun setLibelle(libelle: String) : Tache {
         this.libelle = libelle
         quandMisAJour()
+        return this
     }
 
-    fun setType(type: String) {
+    fun setType(type: String) : Tache {
         this.type = type
         quandMisAJour()
+        return this
     }
 
-    fun setDescription(description: String) {
+    fun setDescription(description: String) : Tache {
         this.description = description
         quandMisAJour()
+        return this
     }
-
-    // Suppression
-
-    fun deleteTache() {
-        // Code pour supprimer la tâche
-    }
-
 
 
 
